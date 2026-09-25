@@ -1,7 +1,8 @@
 import requests
 import random
 import string
-from data.urls import URL
+from data.urls import URL, COURIER_CREATE_ENDPOINT
+
 
 class UserGenerator():
 
@@ -30,7 +31,7 @@ class UserGenerator():
         }
 
         # отправляем запрос на регистрацию курьера и сохраняем ответ в переменную response
-        response = requests.post(f'{URL}/api/v1/courier', data=payload)
+        response = requests.post(f'{URL}{COURIER_CREATE_ENDPOINT}', json=payload)
 
         # если регистрация прошла успешно (код ответа 201), добавляем в список логин и пароль курьера
         if response.status_code == 201:

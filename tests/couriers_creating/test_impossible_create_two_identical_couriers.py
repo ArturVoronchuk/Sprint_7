@@ -1,7 +1,11 @@
+import allure
 import requests
-from data.urls import URL
+
+from data.urls import URL, COURIER_CREATE_ENDPOINT
 
 class TestCantCreateTwoIdenticalCouriers:
+
+    @allure.title("Нельзя создать двух курьеров с одинаковым логином: 409 Conflict")
     def test_cant_create_two_identical_couriers(self, courier_data):
 
         payload = {
@@ -10,17 +14,17 @@ class TestCantCreateTwoIdenticalCouriers:
             "firstName": courier_data["firstName"]
         }
 
-        response = requests.post(f"{URL}/api/v1/courier", json=payload)
+        with allure.step("Пытаемся создать второго курьера с тем же логином"):
+            response_second = requests.post(f"{URL}{COURIER_CREATE_ENDPOINT}", json=payload)
 
-        assert response.status_code == 409, (
-            f"Ожидался статус 409 (конфликт), но получен {response.status_code}. "
-            f"Ответ: {response.text}"
+        assert response_second.status_code == 409, (
+            f"Ожидался 409 (Conflict), но получен {response_second.status_code}. "
+            f"Ответ: {response_second.text}"
         )
 
-        body = response.json()
+        body = response_second.json()
         message = body.get("message", "")
 
         assert "Этот логин уже используется" in message, (
-            f"Ожидалось сообщение с фразой 'Этот логин уже используется', "
-            f"но получено: {message}"
+            f"Ожидалось сообщение 'Этот логин уже используется', но получено: {message}"
         )
